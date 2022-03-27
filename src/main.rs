@@ -1,10 +1,10 @@
-
-use dydx_v3_rust::Client;
-use serde_json::json;
+use crate::services::market_service::MakretService;
+mod services{pub mod market_service;}
 #[tokio::main]
 async fn main() 
 {
-    let  client = Client::new("production");
-    let response = client.get_orderbook(&json!({"market":"EOS-USD"})).await.unwrap();
-    println!("{:?}", response.response.text().await.unwrap());
+    //let  client = Client::new("production");
+    let services=MakretService::new();
+    let makrets =services.get_markets().await;
+    println!("{:?}",makrets);
 }

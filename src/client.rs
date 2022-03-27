@@ -1,7 +1,7 @@
 use super::{Api, Error, Result};
 use http::StatusCode;
 use reqwest::RequestBuilder;
-use serde_json::Value;
+use serde_json::{Value};
 use std::time::Duration;
 
 pub struct Client {
@@ -40,13 +40,13 @@ impl Client {
         self.get("markets", parameters).await
     }
 
-    pub async fn get_orderbook(&self, parameters: &Value) -> Result<Response> {
-        self.get("orderbook", parameters).await
+    pub async fn get_orderbook(&self, market: &str) -> Result<Response> {
+        let url="orderbook".to_string()+"/"+market;
+        self.get_no_query(&url).await
     }
     pub async fn get_trades(&self, parameters: &Value) -> Result<Response> {
         self.get("trades", parameters).await
     }
-
     pub async fn get(&self, endpoint: &str, parameters: &Value) -> Result<Response> {
         let request = self
             .client
@@ -55,7 +55,12 @@ impl Client {
 
         Ok(self.request(request).await?)
     }
-
+    pub async fn get_no_query(&self, endpoint: &str) -> Result<Response> {
+        let request = self
+            .client
+            .get(format!("{}/{}", self.api.url(), endpoint));
+        Ok(self.request(request).await?)
+    }
     async fn request(&self, request: RequestBuilder) -> Result<Response> {
         let request = request.build()?;
 
