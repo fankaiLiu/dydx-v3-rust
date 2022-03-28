@@ -7,6 +7,7 @@ pub enum Error {
     NotFoundError,
     Reqwest(reqwest::Error),
     Json(serde_json::Error),
+    ApiError,
 }
 
 impl From<reqwest::Error> for Error {
@@ -53,6 +54,9 @@ impl std::fmt::Display for Error {
 
             Error::Reqwest(_) | Error::Json(_) => {
                 write!(f, "{}", self)
+            }
+            Error::ApiError => {
+                write!(f, "ApiError")
             }
         }
     }

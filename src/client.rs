@@ -36,18 +36,18 @@ impl Client {
         }
     }
 
-    pub async fn get_markets(&self, parameters: &Value) -> Result<Response> {
+    pub async fn get_markets(&self, parameters: &Value) -> Result<String> {
         self.get("markets", parameters).await
     }
 
-    pub async fn get_orderbook(&self, market: &str) -> Result<Response> {
+    pub async fn get_orderbook(&self, market: &str) -> Result<String> {
         let url="orderbook".to_string()+"/"+market;
         self.get_no_query(&url).await
     }
-    pub async fn get_trades(&self, parameters: &Value) -> Result<Response> {
+    pub async fn get_trades(&self, parameters: &Value) -> Result<String> {
         self.get("trades", parameters).await
     }
-    pub async fn get(&self, endpoint: &str, parameters: &Value) -> Result<Response> {
+    pub async fn get(&self, endpoint: &str, parameters: &Value) -> Result<String> {
         let request = self
             .client
             .get(format!("{}/{}", self.api.url(), endpoint))
@@ -55,13 +55,13 @@ impl Client {
 
         Ok(self.request(request).await?)
     }
-    pub async fn get_no_query(&self, endpoint: &str) -> Result<Response> {
+    pub async fn get_no_query(&self, endpoint: &str) -> Result<String> {
         let request = self
             .client
             .get(format!("{}/{}", self.api.url(), endpoint));
         Ok(self.request(request).await?)
     }
-    async fn request(&self, request: RequestBuilder) -> Result<Response> {
+    async fn request(&self, request: RequestBuilder) -> Result<String> {
         let request = request.build()?;
 
         let response = self
@@ -82,12 +82,16 @@ impl Client {
                 if err.is_connect() || err.is_timeout() {
                     return Err(Error::ApiConnectionError);
                 }
+                else
+                {
+                    return Err(Error::ApiError);
+                }
             }
         };
-
-        Ok(Response {
-            response: response?,
-            request,
-        })
+        let response = response.unwrap().text().await;
+        match response {
+            Ok(response) => Ok(response),
+            Err(_) => Err(Error::ApiError),
+        }
     }
 }

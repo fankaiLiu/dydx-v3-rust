@@ -14,13 +14,7 @@ impl MakretService {
     pub async fn get_markets(&self) -> Option<Vec<Makret>> {
         let response = self
             .client
-            .get_markets(&json!({}))
-            .await
-            .unwrap()
-            .response
-            .text()
-            .await
-            .unwrap();
+            .get_markets(&json!({})).await.unwrap();
         let mut  result=Vec::new();
         let markets = json_to_map(&response);
         if markets.is_object() {
@@ -37,7 +31,6 @@ impl MakretService {
             }
         }
         None
-
     }
 }
 
