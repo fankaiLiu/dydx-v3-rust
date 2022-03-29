@@ -1,4 +1,4 @@
-use dydx_v3_rust::{entities::market::Makret, Client};
+use dydx_v3_rust::{entities::{market::Makret, orderbook::{Orderbook, Order}}, Client};
 use serde::{Deserialize};
 use serde_json::{json, Value};
 
@@ -30,6 +30,34 @@ impl MakretService {
                 }
             }
         }
+        None
+    }
+    pub async fn get_orderbook(&self, market: &str) -> Option<Orderbook> {
+        let response = self
+            .client
+            .get_orderbook(market).await.unwrap();
+        let mut result =Orderbook::new(market);
+        let orderbook = json_to_map(&response);
+        if orderbook.is_object() {
+            let orderbook = orderbook.as_object().unwrap();
+            for (k, v) in orderbook {
+               if k=="bids"{
+                    let bids = v.as_array().unwrap();
+                    for v in bids {
+                        let order=Order::deserialize(v).unwrap();
+                        result.bids.push(order);
+                    }
+                }
+                else if k=="asks"{
+                    let asks = v.as_array().unwrap();
+                    for v in asks {
+                        let order=Order::deserialize(v).unwrap();
+                        result.asks.push(order);
+                    }
+                }
+               }
+               return Some(result);
+            }
         None
     }
 }

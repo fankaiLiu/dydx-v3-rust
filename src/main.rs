@@ -6,5 +6,9 @@ async fn main()
     //let  client = Client::new("production");
     let services=MakretService::new();
     let makrets =services.get_markets().await;
-    println!("{:?}",makrets);
+    // println!("{:?}",makrets);
+    for makret in makrets.unwrap() {
+       let order_book= services.get_orderbook(&makret.market).await;
+       println!("{:?}",order_book);
+    }
 }
