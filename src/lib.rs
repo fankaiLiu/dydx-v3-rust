@@ -7,6 +7,6 @@ use api::Api;
 pub use client::Client;
 pub use client::Response;
 pub use error::Error;
-pub mod entities{pub mod market;pub mod orderbook;}
+pub mod entities{pub mod market;pub mod orderbook;pub mod trade;}
 
 pub type Result<T> = std::result::Result<T, error::Error>;

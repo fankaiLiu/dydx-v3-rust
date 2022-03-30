@@ -44,8 +44,9 @@ impl Client {
         let url="orderbook".to_string()+"/"+market;
         self.get_no_query(&url).await
     }
-    pub async fn get_trades(&self, parameters: &Value) -> Result<String> {
-        self.get("trades", parameters).await
+    pub async fn get_trades(&self, market: &str) -> Result<String> {
+        let url="trades".to_string()+"/"+market;
+        self.get_no_query(&url).await
     }
     pub async fn get(&self, endpoint: &str, parameters: &Value) -> Result<String> {
         let request = self
