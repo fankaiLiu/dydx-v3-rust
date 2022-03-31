@@ -1,6 +1,7 @@
 use chrono::Utc;
 use dydx_v3_rust::{
     entities::{
+        liquidity_providers::{LiquidityProviders, Liquidity},
         market::Makret,
         orderbook::{Order, Orderbook},
         trade::{Trade, Trades},
@@ -78,6 +79,33 @@ impl MakretService {
                         if trade.is_some() {
                             result.push(trade.unwrap());
                         }
+                    }
+                }
+            }
+            return Some(result);
+        }
+        None
+    }
+
+    pub async fn get_liquidity_providers(
+        &self,
+        parameters: &Option<Value>,
+    ) -> Option<LiquidityProviders> {
+        let response = self
+            .client
+            .get_liquidity_providers(parameters)
+            .await
+            .unwrap();
+        let mut result = LiquidityProviders::default();
+        let liquidity_providers = json_to_map(&response);
+        if liquidity_providers.is_object() {
+            let liquidity_providers = liquidity_providers.as_object().unwrap();
+            for (k, v) in liquidity_providers {
+                if k == "liquidityProviders" {
+                    let liquidity_providers = v.as_object().unwrap();
+                    for (k, v) in liquidity_providers {
+                        result.position_id=k.to_string();
+                        result.liquidity = Liquidity::deserialize(v).unwrap();
                     }
                 }
             }

@@ -48,6 +48,16 @@ impl Client {
         let url="trades".to_string()+"/"+market;
         self.get_no_query(&url).await
     }
+
+    pub async fn get_liquidity_providers(&self,parameters: &Option<Value>) -> Result<String> {
+        if  parameters.is_some() {
+            let parameters=parameters.as_ref().unwrap();
+            self.get("fast-withdrawals",parameters).await
+        } else {
+            self.get_no_query("fast-withdrawals").await
+        }
+    }
+
     pub async fn get(&self, endpoint: &str, parameters: &Value) -> Result<String> {
         let request = self
             .client
