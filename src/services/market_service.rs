@@ -4,7 +4,7 @@ use dydx_v3_rust::{
         liquidity_providers::{LiquidityProviders, Liquidity},
         market::Makret,
         orderbook::{Order, Orderbook},
-        trade::{Trade, Trades},
+        trade::{Trade, Trades}, stats::Stats,
     },
     Client,
 };
@@ -110,6 +110,22 @@ impl MakretService {
                 }
             }
             return Some(result);
+        }
+        None
+    }
+
+    pub async fn get_market_stats(&self, market: &str, parameters: &Option<Value>) -> Option<Stats> {
+        let response = self.client.get_market_stats(market,&parameters).await.unwrap();
+        let market_stats = json_to_map(&response);
+        if market_stats.is_object() {
+            let market_stats = market_stats.as_object().unwrap();
+            let market_stats=market_stats.get("markets").unwrap();
+            for (k, v) in market_stats.as_object().unwrap() {
+                if k == market {
+                    let stats=Stats::deserialize(v).unwrap();
+                    return Some(stats);
+                }
+            }
         }
         None
     }

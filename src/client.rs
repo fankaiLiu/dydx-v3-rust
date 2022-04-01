@@ -44,6 +44,7 @@ impl Client {
         let url="orderbook".to_string()+"/"+market;
         self.get_no_query(&url).await
     }
+
     pub async fn get_trades(&self, market: &str) -> Result<String> {
         let url="trades".to_string()+"/"+market;
         self.get_no_query(&url).await
@@ -55,6 +56,16 @@ impl Client {
             self.get("fast-withdrawals",parameters).await
         } else {
             self.get_no_query("fast-withdrawals").await
+        }
+    }
+
+    pub async fn get_market_stats(&self, market: &str,parameters: &Option<Value>) -> Result<String> {
+        let url="stats/".to_string()+market;
+        if  parameters.is_some() {
+            let parameters=parameters.as_ref().unwrap();
+            self.get(&url,parameters).await
+        } else {
+            self.get_no_query(&url).await
         }
     }
 
